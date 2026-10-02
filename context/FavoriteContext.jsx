@@ -1,42 +1,77 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const FavoriteContext = createContext(undefined);
 
 export function FavoriteProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
 
-  const toggleFavorite = (user) => {
-    setFavorites((prev) => {
-      const exists = prev.some((item) => item.id === user.id);
-      if (exists) {
-        return prev.filter((item) => item.id !== user.id);
-      }
-      return [...prev, user];
-    });
-  };
+  // 1. Ambil data favorit dari API saat halaman dimuat
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((res) => res.json())
+      .then((data) => setFavorites(data))
+      .catch((err) => console.error("Error fetching favorites:", err));
+  }, []);
 
-  const isFavorite = (userId) => {
-    return favorites.some((item) => item.id === userId);
+  // 2. Fungsi Add dari Tutor (POST ke API)
+  async function addFavorite(user) {
+    const res = await fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+
+    if (res.ok) {
+      const saved = await res.json();
+      setFavorites((prev) => [...prev, saved]);
+    }
+  }
+
+  // 3. Fungsi Remove dari Tutor (DELETE ke API)
+  async function removeFavorite(userId) {
+    const res = await fetch(`/api/favorites/${userId}`, { method: "DELETE" });
+
+    if (res.ok) {
+      setFavorites((prev) => prev.filter((f) => f.id !== userId));
+    }
+  }
+
+  // 4. Cek apakah user sudah masuk favorit
+  function isFavorite(userId) {
+    return favorites.some((f) => f.id === userId);
+  }
+
+  // 5. Tambahkan fungsi toggleFavorite agar UserCard.jsx bisa memanggilnya
+  async function toggleFavorite(user) {
+    if (isFavorite(user.id)) {
+      await removeFavorite(user.id);
+    } else {
+      await addFavorite(user);
+    }
+  }
+
+  // Masukkan toggleFavorite ke dalam value object
+  const value = {
+    favorites,
+    addFavorite,
+    removeFavorite,
+    toggleFavorite,
+    isFavorite,
   };
 
   return (
-    <FavoriteContext.Provider
-      value={{ favorites, toggleFavorite, isFavorite }}
-    >
+    <FavoriteContext.Provider value={value}>
       {children}
     </FavoriteContext.Provider>
   );
 }
 
-export function useFavorites() {
+export function useFavorite() {
   const context = useContext(FavoriteContext);
-  if (!context) {
-    throw new Error("useFavorites must be used within a FavoriteProvider");
+  if (context === undefined) {
+    throw new Error("useFavorite harus dipakai di dalam <FavoriteProvider>");
   }
   return context;
 }
-
-// Alias agar kompatibel dipanggil tanpa huruf 's'
-export const useFavorite = useFavorites;

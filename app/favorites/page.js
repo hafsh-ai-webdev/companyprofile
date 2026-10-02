@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useFavorites } from "@/context/FavoriteContext";
+import { useFavorite } from "@/context/FavoriteContext";
 import UserCard from "@/components/UserCard";
 
 export default function FavoritesPage() {
-  const { favorites } = useFavorites();
+  const { favorites } = useFavorite();
 
   return (
     <main className="min-h-screen bg-background px-4 py-12 md:px-8 text-foreground transition-colors duration-300">

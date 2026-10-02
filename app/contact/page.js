@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
+// 1. TAMBAHAN DARI MENTOR: Impor fungsi Server Action dari file actions.js
+import { submitContactForm } from "./actions";
+
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@mywebsite.com" },
   { icon: MapPin, label: "Location", value: "Jakarta, Indonesia" },
@@ -24,10 +27,22 @@ export default function Contact() {
     setSubmitted,
   } = useUser();
 
-  function handleSubmit(event) {
+  // 2. TAMBAHAN DARI MENTOR: Menggantikan handleSubmit lama dengan async handleSubmit Server Action
+  async function handleSubmit(event) {
     event.preventDefault();
-    console.log({ name, email, message });
-    setSubmitted(true);
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("message", message);
+
+    const result = await submitContactForm(formData);
+
+    if (result.success) {
+      setSubmitted(true);
+    } else {
+      alert(result.error);
+    }
   }
 
   return (
@@ -126,6 +141,7 @@ export default function Contact() {
                   </Button>
                 </form>
               )}
+
               {/* Note: Div debug state */}
               <div className="mt-6 rounded-xl border border-white/10 bg-muted/50 p-4 text-xs font-mono">
                 <p><span className="font-semibold text-primary">Name:</span> {name}</p>

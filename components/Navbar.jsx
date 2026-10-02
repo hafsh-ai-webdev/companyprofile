@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { useFavorites } from "@/context/FavoriteContext";
+import { useFavorite } from "@/context/FavoriteContext";
 import ThemeToggle from "@/components/ThemeToogle";
 
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 export default function Navbar() {
   const pathname = usePathname();
   const { name, submitted } = useUser();
-  const { favorites } = useFavorites();
+  const { favorites } = useFavorite();
 
   // 1. State Guard untuk mencegah Hydration Error
   const [mounted, setMounted] = useState(false);
