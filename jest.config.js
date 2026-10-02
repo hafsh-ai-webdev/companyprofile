@@ -1,15 +1,3 @@
-// const nextJest = require("next/jest")();
-
-// const createJestConfig = nextJest;
-
-// const customJestConfig = {
-//   testEnvironment: "node",
-// };
-
-// module.exports = createJestConfig(customJestConfig);
-
-
-
 const nextJest = require("next/jest");
 
 // 1. Beri tahu Next.js lokasi root project kamu
