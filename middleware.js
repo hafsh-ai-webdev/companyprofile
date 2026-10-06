@@ -15,20 +15,19 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/maintenance", request.url));
   }
 
-  // --- Latihan 2: Auth Guard Menggunakan Cookie ---
-  if (pathname.startsWith("/favorites")) {
-    const token = request.cookies.get("token");
+  // // --- Latihan 2: Auth Guard Menggunakan Cookie ---
+  // if (pathname.startsWith("/favorites")) {
+  //   const token = request.cookies.get("token");
 
-    if (!token) {
-      // Belum ada tanda login -> lempar ke halaman awal (/) 
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
+  //   if (!token) {
+  //     // Belum ada tanda login -> lempar ke halaman awal (/) 
+  //     return NextResponse.redirect(new URL("/", request.url));
+  //   }
+  // }
 
   return NextResponse.next();
 }
 
-// Config matcher bawaan mentor di Latihan 3
 // (Otomatis mengabaikan /api/ sehingga tidak akan bentrok dengan fetch JSON)
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
