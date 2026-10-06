@@ -31,6 +31,7 @@ export default function Navbar() {
     { href: "/services", label: "Services" },
     { href: "/profile", label: "Profile" },
     { href: "/contact", label: "Contact" },
+    { href: "/messages", label: "Messages" },
     { 
       href: "/favorites", 
       label: `Favorite (${favCount})` 
