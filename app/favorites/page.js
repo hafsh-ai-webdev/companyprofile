@@ -1,57 +1,56 @@
 "use client";
 
 import Link from "next/link";
-import { useFavorite } from "@/context/FavoriteContext";
+import { Heart } from "lucide-react";
+
 import UserCard from "@/components/UserCard";
+import { useFavorite } from "@/context/FavoriteContext";
 
 export default function FavoritesPage() {
   const { favorites } = useFavorite();
 
   return (
-    <main className="min-h-screen bg-background px-4 py-12 md:px-8 text-foreground transition-colors duration-300">
-      <div className="mx-auto max-w-5xl">
-        {/* Tombol kembali */}
-        <Link
-          href="/users"
-          className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-6 font-medium transition-colors"
-        >
-          ← Kembali ke User Directory
-        </Link>
+    <section className="relative">
+      <div className="bg-grid bg-radial-fade absolute inset-0 -z-10" />
 
-        {/* Header Section */}
-        <div className="mb-8">
-          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-            Koleksi Favorit
-          </span>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
+      <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold text-primary">Favorite</p>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-5xl">
             My Favorite Users
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Daftar pengguna pilihan yang sudah kamu simpan secara dinamis.
+          <p className="mt-4 text-muted-foreground">
+            Data ini diambil langsung dari FavoriteContext.
           </p>
         </div>
 
-        {/* Konten Favorit */}
-        {favorites.length === 0 ? (
-          <div className="rounded-2xl border border-border/60 bg-foreground/[0.02] p-12 text-center backdrop-blur-sm dark:border-white/10">
-            <p className="text-muted-foreground mb-6">
-              Belum ada user yang kamu tambahkan ke daftar favorit.
-            </p>
-            <Link
-              href="/users"
-              className="inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 shadow-md hover:shadow-primary/20"
-            >
-              Jelajahi User Directory
-            </Link>
+        {favorites.length > 0 ? (
+          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {favorites.map((favorite) => (
+              <UserCard
+                key={favorite.id}
+                user={{
+                  id: favorite.app_users.id,
+                  name: favorite.app_users.name,
+                  email: favorite.app_users.email,
+                  company: { name: favorite.app_users.company_name },
+                }}
+              />
+            ))}
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {favorites.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
+          <div className="mt-16 flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
+            <Heart className="size-8" />
+            <p>Belum ada user favorit. Tandai dulu dari User Directory.</p>
+            <Link
+              href="/users"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Buka User Directory →
+            </Link>
           </div>
         )}
       </div>
-    </main>
+    </section>
   );
 }

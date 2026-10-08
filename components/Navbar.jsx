@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext"; // 1. Import AuthContext baru dari mentor
 import { useFavorite } from "@/context/FavoriteContext";
 import ThemeToggle from "@/components/ThemeToogle";
 
@@ -13,6 +14,7 @@ import { buttonVariants } from "@/components/ui/button";
 export default function Navbar() {
   const pathname = usePathname();
   const { name, submitted } = useUser();
+  const { isLoggedIn } = useAuth(); // 2. Ambil status isLoggedIn
   const { favorites } = useFavorite();
 
   // 1. State Guard untuk mencegah Hydration Error
@@ -42,7 +44,7 @@ export default function Navbar() {
     <header className="sticky top-4 z-50 mx-auto w-full max-w-5xl px-4">
       <nav className="flex items-center justify-between gap-3 rounded-full border border-border/60 bg-background/80 px-4 py-2 shadow-lg shadow-black/5 backdrop-blur-xl transition-all dark:border-white/10 dark:shadow-black/20 md:px-5 md:py-2.5">
         
-        {/* Logo / Brand */}
+        {/* Logo / Brand Tim */}
         <Link
           href="/"
           className="shrink-0 whitespace-nowrap text-base font-extrabold tracking-tight text-foreground transition-opacity hover:opacity-80 md:text-lg"
@@ -75,9 +77,9 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* User Greeting, Theme Toggle & CTA */}
+        {/* User Greeting, Theme Toggle & Login/Logout Action */}
         <div className="flex shrink-0 items-center gap-2.5 md:gap-3">
-          {/* 3. Hanya tampilkan sapaan nama jika sudah mounted di client */}
+          {/* Tampilkan sapaan nama jika sudah mounted */}
           {mounted && submitted && (
             <span className="hidden whitespace-nowrap text-xs font-medium text-muted-foreground lg:inline-block md:text-sm">
               Hi, <span className="font-semibold text-primary">{name}</span> 👋
@@ -87,15 +89,30 @@ export default function Navbar() {
           {/* Pemanggilan Komponen ThemeToggle */}
           <ThemeToggle />
 
-          <Link
-            href="/contact"
-            className={cn(
-              buttonVariants({ size: "default" }),
-              "whitespace-nowrap rounded-full font-semibold shadow-sm transition-all hover:shadow-md hover:shadow-primary/20 text-xs md:text-sm px-4 md:px-5"
-            )}
-          >
-            Get in touch
-          </Link>
+          {/* 3. Tombol Login/Logout Dinamis Sesuai Desain UI Tim */}
+          {mounted && isLoggedIn ? (
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "default" }),
+                  "whitespace-nowrap rounded-full font-semibold transition-all text-xs md:text-sm px-4 md:px-5"
+                )}
+              >
+                Logout
+              </button>
+            </form>
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ size: "default" }),
+                "whitespace-nowrap rounded-full font-semibold shadow-sm transition-all hover:shadow-md hover:shadow-primary/20 text-xs md:text-sm px-4 md:px-5"
+              )}
+            >
+              Login
+            </Link>
+          )}
         </div>
       </nav>
     </header>

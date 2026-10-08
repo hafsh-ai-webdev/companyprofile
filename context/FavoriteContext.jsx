@@ -1,26 +1,35 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const FavoriteContext = createContext(undefined);
 
 export function FavoriteProvider({ children }) {
+  const { isLoggedIn } = useAuth();
   const [favorites, setFavorites] = useState([]);
 
-  // 1. Ambil data favorit dari API saat halaman dimuat
   useEffect(() => {
-    fetch("/api/favorites")
-      .then((res) => res.json())
-      .then((data) => setFavorites(data))
-      .catch((err) => console.error("Error fetching favorites:", err));
-  }, []);
+    if (!isLoggedIn) {
+      setFavorites([]);
+      return;
+    }
 
-  // 2. Fungsi Add dari Tutor (POST ke API)
+    fetch("/api/favorites")
+      .then((res) => (res.ok ? res.json() : []))
+      .then(setFavorites);
+  }, [isLoggedIn]);
+
   async function addFavorite(user) {
+    if (!isLoggedIn) {
+      alert("Silakan login terlebih dahulu untuk menambahkan favorite.");
+      return;
+    }
+
     const res = await fetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
+      body: JSON.stringify({ user_id: user.id }),
     });
 
     if (res.ok) {
@@ -29,37 +38,19 @@ export function FavoriteProvider({ children }) {
     }
   }
 
-  // 3. Fungsi Remove dari Tutor (DELETE ke API)
   async function removeFavorite(userId) {
     const res = await fetch(`/api/favorites/${userId}`, { method: "DELETE" });
 
     if (res.ok) {
-      setFavorites((prev) => prev.filter((f) => f.id !== userId));
+      setFavorites((prev) => prev.filter((f) => f.user_id !== userId));
     }
   }
 
-  // 4. Cek apakah user sudah masuk favorit
   function isFavorite(userId) {
-    return favorites.some((f) => f.id === userId);
+    return favorites.some((f) => f.user_id === userId);
   }
 
-  // 5. Tambahkan fungsi toggleFavorite agar UserCard.jsx bisa memanggilnya
-  async function toggleFavorite(user) {
-    if (isFavorite(user.id)) {
-      await removeFavorite(user.id);
-    } else {
-      await addFavorite(user);
-    }
-  }
-
-  // Masukkan toggleFavorite ke dalam value object
-  const value = {
-    favorites,
-    addFavorite,
-    removeFavorite,
-    toggleFavorite,
-    isFavorite,
-  };
+  const value = { favorites, addFavorite, removeFavorite, isFavorite };
 
   return (
     <FavoriteContext.Provider value={value}>

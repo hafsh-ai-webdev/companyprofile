@@ -1,9 +1,12 @@
 import { connection } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server"; // <-- Ganti import lama di sini
 import { deleteMessageAction } from "./actions";
 
 export default async function MessagesPage() {
   await connection();
+
+  // Buat instance client Supabase server
+  const supabase = await createClient(); // <-- Tambahkan baris ini
 
   const { data: messages, error } = await supabase
     .from("messages")
@@ -24,7 +27,7 @@ export default async function MessagesPage() {
       <h1 className="text-3xl font-bold">Pesan Masuk</h1>
 
       <div className="mt-8 space-y-4">
-        {messages.length === 0 ? (
+        {!messages || messages.length === 0 ? (
           <p className="text-muted-foreground">Belum ada pesan masuk.</p>
         ) : (
           messages.map((msg) => (
